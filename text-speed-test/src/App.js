@@ -1,5 +1,5 @@
 
-import '/App.css';
+import './App.css';
 import Button from "./Button";
 import Spacer from "./Spacer";
 import {useEffect, useRef, useState} from "react";
