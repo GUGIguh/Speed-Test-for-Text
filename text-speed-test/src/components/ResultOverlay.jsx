@@ -1,9 +1,9 @@
-import CompletedIcon from "./Icons/Completed-icon";
+import CompletedIcon from "../Icons/Completed-icon";
 import ResultCard from "./ResultCard";
-import RestartIcon from "./Icons/Restart-icon";
-import PersonalBestIcon from "./Icons/PersonalBest-icon";
+import RestartIcon from "../Icons/Restart-icon";
+import PersonalBestIcon from "../Icons/PersonalBest-icon";
 
-export  default  function ({wpm,accuracy,correctChars,incorrectChars,resultStatus,setResult,setTimerActive,setUserInput}){
+export  default  function ({wpm,accuracy,correctChars,incorrectChars,resultStatus,setResult,setTimerActive,resetTest}){
 
     const messageObj ={
       message:{
@@ -26,8 +26,8 @@ export  default  function ({wpm,accuracy,correctChars,incorrectChars,resultStatu
 
     function buttonHandler () {
         setResult(false);
+        resetTest();
         setTimerActive(true);
-        setUserInput("");
     }
    return(
        <div className="absolute inset-0 flex items-start justify-center z-50">

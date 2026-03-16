@@ -1,14 +1,13 @@
-
-import './App.css';
-import Button from "./Button";
-import Spacer from "./Spacer";
+import '../styles/App.css';
+import Button from "../components/Button";
+import Spacer from "../components/Spacer";
 import {useEffect, useRef, useState} from "react";
-import Overlay from "./Overlay";
-import Hint from "./Hint";
-import data from './data.json';
-import ResultOverlay from "./resultOverlay";
-import RestartIcon from "./Icons/Restart-icon";
-import PersonalBestIcon from "./Icons/PersonalBest-icon";
+import Overlay from "../components/Overlay";
+import Hint from "../components/Hint";
+import data from '../data.json';
+import ResultOverlay from "../components/ResultOverlay";
+import PersonalBestIcon from "../Icons/PersonalBest-icon";
+import RestartBtn from "../components/RestartBtn";
 
 export const random =  () => Math.floor(Math.random()*10);
 
@@ -27,7 +26,6 @@ export function wordsCounter(resultText,userText,set){
     }
     return set.size;
 }
-
 function App() {
 
     const [isStarted,setIsStarted] = useState(false);
@@ -35,6 +33,7 @@ function App() {
     const [timerActive,setTimerActive] = useState(false);
     const [userInput,setUserInput] = useState("");
     const [mode,setMode] = useState("60s");
+    const [selectedLevel,setSelectedLevel] = useState("easy");
     const [time,setTime] = useState("0:00");
     const [result,setResult] = useState(false);
     const [seconds, setSeconds] = useState(0);
@@ -56,6 +55,14 @@ function App() {
         return (mins+":"+formatSec.toString().padStart(2,'0'))
     }
 
+    function resetTest(){
+        setTimerActive(false);
+        setUserInput("");
+        setWordsCount(0);
+        setAccuracy(100);
+        setErrors(0);
+    }
+
     useEffect(() => {
         if (timerActive) {
             intervalRef.current = setInterval(() =>
@@ -67,6 +74,8 @@ function App() {
                         clearInterval(intervalRef.current);
                         setTimerActive(false);
                         setResult(true);
+
+                        localStorage.setItem("myRecord",wordsCount.toString());
                     }
                     return newSec;
                 });
@@ -80,6 +89,7 @@ function App() {
             if (myRecord){
                 if (wordsCount > myRecord){
                     setResultStatus("newRecord");
+                    localStorage.setItem("myRecord",wordsCount.toString());
                 }
                 else setResultStatus("testCompleted");
             }
@@ -101,6 +111,9 @@ function App() {
             setErrors((prev)=> prev + 1);
         }
         if (userInput) {
+            if (!timerActive) {
+                setTimerActive(true);
+            }
             const newAccuracy = Math.floor((userInput.length - errors) / userInput.length * 100);
             if (newAccuracy >= 0) setAccuracy(newAccuracy);
             console.log(userInput[userInput.length-1]);
@@ -112,7 +125,6 @@ function App() {
             else{
                 setWordsCount(Math.floor(words/(seconds % 60)));
             }
-
         }
     }, [userInput]);
 
@@ -137,14 +149,14 @@ function App() {
                         <div> Time: <span className="font-black"> {time} </span></div>
                     </div>
                     <nav className="flex gap-5">
-                        <div className="">
+                        <div className="" >
                             <span className="mr-2"> Difficulty:</span>
                             <Button text={"Easy"} setIsStarted={setIsStarted} setText={setText}
-                                    setUserInput={setUserInput} setTimerActive={setTimerActive}></Button>
+                                    setSelectedLevel={setSelectedLevel} selectedLevel={selectedLevel} resetTest={resetTest}/>
                             <Button text={"Medium"} setIsStarted={setIsStarted} setText={setText}
-                                    setUserInput={setUserInput} setTimerActive={setTimerActive}></Button>
+                                    setSelectedLevel={setSelectedLevel} selectedLevel={selectedLevel} resetTest={resetTest}/>
                             <Button text={"Hard"} setIsStarted={setIsStarted} setText={setText}
-                                    setUserInput={setUserInput} setTimerActive={setTimerActive}></Button>
+                                    setSelectedLevel={setSelectedLevel} selectedLevel={selectedLevel} resetTest={resetTest}/>
                         </div>
                         <Spacer/>
                         <div>
@@ -169,16 +181,13 @@ function App() {
 
                 {result && <ResultOverlay wpm={wordsCount} accuracy={accuracy} correctChars={userInput.length}
                                           incorrectChars={errors} resultStatus={resultStatus} setResult={setResult}
-                                          setTimerActive={setTimerActive} setUserInput={setUserInput}/>
+                                          setTimerActive={setTimerActive} resetTest={resetTest}/>
                 }
             </div>
             <footer className="">
-                {isStarted &&
+                {isStarted && !result &&
                     <div className="flex items-center justify-center pt-4">
-                        <button
-                            className="flex gap-1 items-center px-2 py-2 bg-gray-800 font-semibold text-white rounded-xl ">
-                            Restart Test <RestartIcon/>
-                        </button>
+                        <RestartBtn resetTest={resetTest}/>
                     </div>
                 }
             </footer>

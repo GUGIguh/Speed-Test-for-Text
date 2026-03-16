@@ -1,4 +1,4 @@
-export default function ({text,userInput,setTimerActive}){
+export default function ({text,userInput}){
 
 
     function renderText() {
